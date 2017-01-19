@@ -9,24 +9,38 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  Image,
+  ScrollView,
+  Modal
 } from 'react-native';
 
+import Lightbox from './Lightbox';
+
+const images = [{
+  uri: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Wurstplatte.jpg'
+}];
+
 export default class example extends Component {
+
+  componentWillMount() {
+    Image.prefetch(images[0].uri);
+  }
+
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Text style={styles.welcome}>
-          Welcome to React Native!
+          Click the photo
         </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
+        <Lightbox images={images}>
+          <Image
+            style={styles.contain}
+            resizeMode="cover"
+            source={{ uri: images[0].uri }}
+          />
+        </Lightbox>
+      </ScrollView>
     );
   }
 }
@@ -34,14 +48,22 @@ export default class example extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: 'column',
+    paddingTop: 48,
     backgroundColor: '#F5FCFF',
+  },
+  contain: {
+    flex: 1,
+    height: 150,
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
+    marginVertical: 10,
+  },
+  bannerImageContainer: {
+    backgroundColor: 'red',
+    height: 200,
   },
   instructions: {
     textAlign: 'center',
