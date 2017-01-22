@@ -72,8 +72,8 @@ class Lightbox extends Component {
 
 var styles = StyleSheet.create({
     image: {
-        width: window.width,
-        height: window.height,
+        width: window.width - 50,
+        height: window.height - 50,
         justifyContent: 'center',
         alignItems: 'center',
     },

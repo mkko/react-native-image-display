@@ -61,13 +61,27 @@ class ImageViewer extends Component {
       .then(() => getSize(uri))
       .then(size => {
         console.log(`✔ Got size ${size}`);
+        // TODO: layout might not be available yet.
+        var {width, height} = this.state.layout;
+        const minimumZoomScale = width / size.width;
+        console.log('minimumZoomScale', minimumZoomScale);
+
         this.setState({
           preloadedSource: this.props.source,
+          minimumZoomScale: minimumZoomScale,
           size,
-        })
+        });
       });
 
+    this.onLayout = this.onLayout.bind(this);
     this.onImageLoad = this.onImageLoad.bind(this);
+  }
+
+  onLayout(event) {
+    console.log('w:', event.nativeEvent.layout.width);
+    this.setState({
+      layout: event.nativeEvent.layout,
+    });
   }
 
   handleScroll(event) {
@@ -87,37 +101,39 @@ class ImageViewer extends Component {
     );
   }
 
+  renderContent() {
+    return (
+      <ScrollView
+        style={{backgroundColor: '#000d'}}
+        contentContainerStyle={{ alignItems:'center', justifyContent:'center', width: 2448, height: 3264}}
+        centerContent={true}
+        maximumZoomScale={this.state.maximumZoomScale}
+        minimumZoomScale={this.state.minimumZoomScale} 
+        alwaysBounceHorizontal={true}
+        alwaysBounceVertical={true}
+        horizontal={true}
+        directionalLockEnabled={false}
+        showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator} 
+        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator} 
+        onScroll={this.handleScroll}>
+          <TouchableWithoutFeedback>
+            <Image
+              source={this.state.preloadedSource}
+              style={{width: this.state.size.width, height: this.state.size.height}}
+              onLoad={this.onImageLoad} />
+          </TouchableWithoutFeedback>
+      </ScrollView>
+    );
+  }
+
   render() {
     const onTap = this.props.onTap ? this.props.onTap : function() {};
 
     const isLoading = (this.state.isLoading || !this.state.size)
 
     return (
-      <View style={styles.container}>
-        <ScrollView
-          style={{backgroundColor: '#000d'}}
-          contentContainerStyle={{ alignItems:'center', justifyContent:'center', width: 2448, height: 3264}}
-          centerContent={true}
-          maximumZoomScale={this.state.maximumZoomScale}
-          minimumZoomScale={this.state.minimumZoomScale} 
-          alwaysBounceHorizontal={true}
-          alwaysBounceVertical={true}
-          horizontal={true}
-          directionalLockEnabled={false}
-          showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator} 
-          showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator} 
-          onScroll={this.handleScroll}>
-
-          {this.state.isLoading && this.renderLoading()}
-          {this.state.size &&
-            <TouchableWithoutFeedback onPress={onTap}>
-              <Image
-                source={this.state.preloadedSource}
-                style={{width: this.state.size.width, height: this.state.size.height}}
-                onLoad={this.onImageLoad} />
-            </TouchableWithoutFeedback>}
-
-        </ScrollView>
+      <View style={styles.container} onLayout={this.onLayout}>
+        {this.state.size ? this.renderContent() : this.renderLoading()}
       </View>
     );
   }}
