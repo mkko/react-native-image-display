@@ -11,6 +11,7 @@ import {
   Modal,
   Image,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 
 const propTypes = {
@@ -24,39 +25,72 @@ const defaultProps = {
 
 const intialState = {
   backgroundOpacity: new Animated.Value(1),
+  isLoading: true,
+  size: null,
   maximumZoomScale: 1,
   minimumZoomScale: 1,
 };
+
+function getSize(uri) {
+  return new Promise((resolve, reject) => {
+    Image.getSize(uri, (width, height) => {
+      resolve({width, height});
+    }, err => {
+      reject(err);
+    });
+  });
+}
 
 class ImageViewer extends Component {
 
   constructor(props) {
     super(props);
     this.state = intialState;
-  }
 
-  _onPressButton() {
-    console.log('!!!');
-  }
+    // Image.getSize(this.props.source.uri, (width, height) => {
+    //   console.log('size:', width, 'x', height);
+    //   this.setState({size : {width, height}});
+    // });
 
-  _onLightboxScroll() {
+    const uri = this.props.source.uri;
+    Image
+      .prefetch(uri)
+      .then(() => {
+        console.log(`✔ Prefetch OK from ${uri}`);
+      })
+      .then(() => getSize(uri))
+      .then(size => {
+        console.log(`✔ Got size ${size}`);
+        this.setState({
+          preloadedSource: this.props.source,
+          size,
+        })
+      });
 
+    this.onImageLoad = this.onImageLoad.bind(this);
   }
 
   handleScroll(event) {
     console.log(event.nativeEvent.contentOffset.y);
   }
 
-  onImageLayout(event) {
-    console.log(event.nativeEvent);
+  onImageLoad() {
+    console.log('Image loaded:');
+    this.setState({
+      isLoading: false,
+    });
   }
 
-  onImageLoad() {
-
+  renderLoading() {
+    return (
+      <ActivityIndicator animating={true} />
+    );
   }
 
   render() {
     const onTap = this.props.onTap ? this.props.onTap : function() {};
+
+    const isLoading = (this.state.isLoading || !this.state.size)
 
     return (
       <View style={styles.container}>
@@ -74,12 +108,14 @@ class ImageViewer extends Component {
           showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator} 
           onScroll={this.handleScroll}>
 
-          <TouchableWithoutFeedback onPress={onTap}>
-            <Image
-              source={this.props.source}
-              style={{width: 2448, height: 3264}}
-              />
-          </TouchableWithoutFeedback>
+          {this.state.isLoading && this.renderLoading()}
+          {this.state.size &&
+            <TouchableWithoutFeedback onPress={onTap}>
+              <Image
+                source={this.state.preloadedSource}
+                style={{width: this.state.size.width, height: this.state.size.height}}
+                onLoad={this.onImageLoad} />
+            </TouchableWithoutFeedback>}
 
         </ScrollView>
       </View>
@@ -103,7 +139,6 @@ var styles = StyleSheet.create({
     height: 200,
   },
 });
-
 
 ImageViewer.propTypes = propTypes;
 ImageViewer.defaultProps = defaultProps;

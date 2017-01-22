@@ -46,18 +46,6 @@ class Lightbox extends Component {
     });
   }
 
-  renderFullScreen() {
-    return (
-      <ImageViewer
-        source={{ uri: this.props.images[0].uri }}
-        style={styles.image}
-        />
-    );
-    // return (
-    //   <ZoomableImage />
-    // );
-  }
-
   render() {
     return (
       <View
@@ -72,7 +60,10 @@ class Lightbox extends Component {
         </Animated.View>
 
         <LightboxOverlay isVisible={this.state.isOpen} imageUrl={this.props.images[0].uri}>
-          {this.renderFullScreen()}
+          <ImageViewer
+            source={{ uri: this.props.images[0].uri }}
+            style={styles.image}
+            />
         </LightboxOverlay>
       </View>
     );
