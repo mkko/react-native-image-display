@@ -15,6 +15,10 @@ const propTypes = {
   style: View.propTypes.style,
   imageUrl: PropTypes.string,
   isVisible: PropTypes.bool,
+  renderHeader: PropTypes.func.isRequired,
+  renderFooter: PropTypes.func,
+  onClose: PropTypes.func.isRequired,
+
 };
 
 const defaultProps = {
@@ -22,7 +26,8 @@ const defaultProps = {
 };
 
 const intialState = {
-  backgroundOpacity: new Animated.Value(1),
+  openVal: new Animated.Value(0),
+  isAnimating: false,
 };
 
 class LightboxOverlay extends Component {
@@ -32,47 +37,83 @@ class LightboxOverlay extends Component {
     this.state = intialState;
   }
 
-  _onPressButton() {
-    console.log('!!!');
+  open() {
+    Animated.spring(
+      this.state.openVal,
+      {
+        toValue: 1,
+      }
+    ).start(() => this.setState({ isAnimating: false }));
   }
 
-  _onLightboxScroll() {
+  close() {
+    Animated.spring(
+      this.state.openVal,
+      {
+        toValue: 0
+      }
+    ).start(() => {
+      this.setState({
+        isAnimating: false,
+      });
+      this.props.onClose();
+    });
+  }
 
+  renderBackground() {
+    return (
+      <Animated.View
+        style={styles.background}
+      />
+    );
   }
 
   render() {
+
+    // var lightboxOpacity = {
+    //   opacity: this.openVal.interpolate({inputRange: [0, 1], outputRange: [0, target.opacity]})
+    // };
+
     return (
-      <Modal visible={this.props.isVisible} transparent={true}>
-        {this.props.header}
+      <Modal visible={this.props.isVisible} transparent={true} onRequestClose={() => {}}>
+        {this.renderBackground()}
         {this.props.children}
-        {this.props.footer}
+        <View pointerEvents='box-none' style={styles.overlay}>
+          <View pointerEvents='auto' style={styles.headerContainer}>
+            {this.props.renderHeader(this.props.onClose)}
+          </View>
+          <View pointerEvents='none' style={styles.footerContainer}>
+            {this.props.renderFooter()}
+          </View>
+        </View>
       </Modal>
     );
-    // return (
-    //   <Modal visible={this.props.isVisible} transparent={true}>
-    //     <ScrollView
-    //       style={styles.container}
-    //       minimumZoomScale={1}
-    //       maximumZoomScale={10}
-    //       bouncesZoom={true}
-    //       centerContent={true}
-    //       scrollEventThrottle={200}
-    //       onScroll={this._onLightboxScroll}
-    //       onTouchEnd={(evt) => {
-    //         // if (this.props.swipeToDismiss) {
-    //         //   return;
-    //         // }
-    //         // this._handleDoubleTap(evt,false);
-    //       }}>
-    //       <Animated.Image source={{uri: this.props.imageUrl}} style={styles.imageStyle}/>
-    //     </ScrollView>
-    //   </Modal>
-    // );
   }}
 
 var styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#0005',
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000e',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    minHeight: 66, // TODO: Depends on the device family.
+  },
+  footerContainer: {
+    flex: 1,
+    flexDirection: 'column-reverse',
   },
 });
 

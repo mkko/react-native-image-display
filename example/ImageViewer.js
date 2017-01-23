@@ -12,6 +12,7 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 
 const propTypes = {
@@ -24,7 +25,7 @@ const defaultProps = {
 };
 
 const intialState = {
-  backgroundOpacity: new Animated.Value(1),
+  backgroundOpacity: new Animated.Value(0),
   isLoading: true,
   size: null,
   maximumZoomScale: 1,
@@ -47,11 +48,6 @@ class ImageViewer extends Component {
     super(props);
     this.state = intialState;
 
-    // Image.getSize(this.props.source.uri, (width, height) => {
-    //   console.log('size:', width, 'x', height);
-    //   this.setState({size : {width, height}});
-    // });
-
     const uri = this.props.source.uri;
     Image
       .prefetch(uri)
@@ -62,16 +58,19 @@ class ImageViewer extends Component {
       .then(size => {
         console.log(`✔ Got size ${size}`);
         // TODO: layout might not be available yet.
-        var {width, height} = this.state.layout;
-        const minimumZoomScale = width / size.width;
+        const {width, height} = this.state.layout;
+        const minimumZoomScale = Math.min(height / size.height, width / size.width);
         console.log('minimumZoomScale', minimumZoomScale);
+        
+        size = Dimensions.get('window');
 
         this.setState({
           preloadedSource: this.props.source,
-          minimumZoomScale: minimumZoomScale,
+          minimumZoomScale,
           size,
         });
       });
+
 
     this.onLayout = this.onLayout.bind(this);
     this.onImageLoad = this.onImageLoad.bind(this);
@@ -92,34 +91,43 @@ class ImageViewer extends Component {
     console.log('Image loaded:');
     this.setState({
       isLoading: false,
+    }, () => {
+      Animated.timing(
+        this.state.backgroundOpacity,
+        {toValue: 1, duration: 400,}
+      ).start();
     });
+    
   }
 
   renderLoading() {
     return (
-      <ActivityIndicator animating={true} />
+      <ActivityIndicator style={styles.activityIndicator} animating={!this.state.preloadedSource} />
     );
   }
 
   renderContent() {
-    return (
+    return this.state.size && (
       <ScrollView
-        style={{backgroundColor: '#000d'}}
-        contentContainerStyle={{ alignItems:'center', justifyContent:'center', width: 2448, height: 3264}}
+        style={styles.container}
+        contentContainerStyle={{ alignItems:'center', justifyContent:'center', width: this.state.size.width, height: this.state.size.height}}
+        minimumZoomScale={1} 
+        maximumZoomScale={10}
         centerContent={true}
-        maximumZoomScale={this.state.maximumZoomScale}
-        minimumZoomScale={this.state.minimumZoomScale} 
+        bounces={true}
+        bouncesZoom={true}
         alwaysBounceHorizontal={true}
         alwaysBounceVertical={true}
         horizontal={true}
         directionalLockEnabled={false}
         showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator} 
         showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator} 
+        scrollEventThrottle={200}
         onScroll={this.handleScroll}>
-          <TouchableWithoutFeedback>
-            <Image
+          <TouchableWithoutFeedback style={styles.container}>
+            <Animated.Image
               source={this.state.preloadedSource}
-              style={{width: this.state.size.width, height: this.state.size.height}}
+              style={[styles.image, {width: this.state.size.width, height: this.state.size.height, opacity: this.state.backgroundOpacity}]}
               onLoad={this.onImageLoad} />
           </TouchableWithoutFeedback>
       </ScrollView>
@@ -129,19 +137,23 @@ class ImageViewer extends Component {
   render() {
     const onTap = this.props.onTap ? this.props.onTap : function() {};
 
-    const isLoading = (this.state.isLoading || !this.state.size)
-
     return (
       <View style={styles.container} onLayout={this.onLayout}>
-        {this.state.size ? this.renderContent() : this.renderLoading()}
+        {this.renderLoading()}
+        {this.renderContent()}
       </View>
     );
   }}
 
 var styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#000d',
+  },
+  image: {
+    resizeMode: 'contain',
+  },
+  activityIndicator: {
+    position: 'absolute',
+    left: 0, top: 0, right: 0, bottom: 0,
   },
   contain: {
     flex: 1,

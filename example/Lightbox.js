@@ -7,8 +7,11 @@ import {
   Dimensions,
   Animated,
   TouchableHighlight,
+  TouchableOpacity,
+  Text,
   View,
   Modal,
+  Image,
 } from 'react-native';
 import LightboxOverlay from './LightboxOverlay';
 import ImageViewer from './ImageViewer';
@@ -18,6 +21,8 @@ const propTypes = {
   style: View.propTypes.style,
   images: PropTypes.array,
   children: PropTypes.node.isRequired,
+  renderHeader: PropTypes.func,
+  renderFooter: PropTypes.func,
 };
 
 const defaultProps = {
@@ -25,7 +30,7 @@ const defaultProps = {
 };
 
 const intialState = {
-  isOpen: false,
+  isOpen: true,
   backgroundOpacity: new Animated.Value(1),
 };
 
@@ -37,16 +42,35 @@ class Lightbox extends Component {
     super(props);
     this.state = intialState;
 
-    this._onPressButton = this._onPressButton.bind(this);
+    this.open = this.open.bind(this);
+    this.close = this.close.bind(this);
+    this.renderDefaultHeader = this.renderDefaultHeader.bind(this);
   }
 
-  _onPressButton() {
+  open() {
     this.setState({
       isOpen: true,
     });
   }
 
+  close() {
+    console.log('close!');
+    this.setState({
+      isOpen: false,
+    });
+  }
+
+  renderDefaultHeader(close) {
+    console.log('close:', close);
+    return (
+      <TouchableOpacity onPress={close}>
+        <Text style={styles.close}>×</Text>
+      </TouchableOpacity>
+    );
+  }
+
   render() {
+    console.log('this.close', this.close);
     return (
       <View
         ref={component => this._root = component}
@@ -54,12 +78,18 @@ class Lightbox extends Component {
         <Animated.View>
           <TouchableHighlight
             underlayColor={this.props.underlayColor}
-            onPress={this._onPressButton}>
+            onPress={this.open}>
             {this.props.children}
           </TouchableHighlight>
         </Animated.View>
 
-        <LightboxOverlay isVisible={this.state.isOpen} imageUrl={this.props.images[0].uri}>
+        <LightboxOverlay
+          isVisible={this.state.isOpen}
+          imageUrl={this.props.images[0].uri}
+          renderHeader={this.props.renderHeader || this.renderDefaultHeader}
+          renderFooter={this.props.renderFooter}
+          onClose={this.close}
+          >
           <ImageViewer
             source={{ uri: this.props.images[0].uri }}
             style={styles.image}
@@ -71,12 +101,18 @@ class Lightbox extends Component {
 }
 
 var styles = StyleSheet.create({
-    image: {
-        width: window.width - 50,
-        height: window.height - 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+  image: {
+    width: window.width,
+    height: window.height,
+  },
+  close: {
+    marginTop: 16,
+    fontSize: 35,
+    textAlign: 'center',
+    color: 'white',
+    width: 44,
+    height: 44,
+  }
 });
 
 Lightbox.propTypes = propTypes;

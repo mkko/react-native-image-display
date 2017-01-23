@@ -18,7 +18,8 @@ import {
 import Lightbox from './Lightbox';
 
 const images = [{
-  uri: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Wurstplatte.jpg'
+  //uri: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Wurstplatte.jpg'
+  uri: 'file:///Users/mval/8866.jpeg'
 }];
 
 export default class example extends Component {
@@ -27,15 +28,27 @@ export default class example extends Component {
     Image.prefetch(images[0].uri);
   }
 
+  renderFooter() {
+    return (
+      <View style={{paddingLeft: 16, paddingRight: 16, paddingBottom: 12, paddingTop: 12, backgroundColor: '#0007'}}>
+        <Text style={{color: 'white'}}>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti ab ea nisi suscipit, optio officia, autem ad provident tempora alias laborum culpa ratione accusantium. Ex minima asperiores eius ipsa itaque!
+        </Text>
+      </View>
+    );
+  }
+
   render() {
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.welcome}>
           Click the photo
         </Text>
-        <Lightbox images={images}>
+        <Lightbox
+          images={images}
+          renderFooter={this.renderFooter}>
           <Image
-            style={styles.contain}
+            style={styles.thumbnail}
             resizeMode="cover"
             source={{ uri: images[0].uri }}
           />
@@ -52,9 +65,11 @@ const styles = StyleSheet.create({
     paddingTop: 48,
     backgroundColor: '#F5FCFF',
   },
-  contain: {
+  thumbnail: {
     flex: 1,
     height: 150,
+    width: 150,
+    resizeMode: 'stretch',
   },
   welcome: {
     fontSize: 20,
