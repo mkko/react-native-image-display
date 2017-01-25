@@ -30,7 +30,7 @@ const defaultProps = {
 };
 
 const intialState = {
-  isOpen: true,
+  isOpen: false,
   backgroundOpacity: new Animated.Value(1),
 };
 
@@ -54,14 +54,12 @@ class Lightbox extends Component {
   }
 
   close() {
-    console.log('close!');
     this.setState({
       isOpen: false,
     });
   }
 
   renderDefaultHeader(close) {
-    console.log('close:', close);
     return (
       <TouchableOpacity onPress={close}>
         <Text style={styles.close}>×</Text>
@@ -70,7 +68,6 @@ class Lightbox extends Component {
   }
 
   render() {
-    console.log('this.close', this.close);
     return (
       <View
         ref={component => this._root = component}

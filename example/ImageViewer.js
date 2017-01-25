@@ -64,13 +64,13 @@ class ImageViewer extends Component {
         
         size = Dimensions.get('window');
 
+        // TODO: The component might not be mounted anymore.
         this.setState({
           preloadedSource: this.props.source,
           minimumZoomScale,
           size,
         });
       });
-
 
     this.onLayout = this.onLayout.bind(this);
     this.onImageLoad = this.onImageLoad.bind(this);
@@ -93,8 +93,10 @@ class ImageViewer extends Component {
       isLoading: false,
     }, () => {
       Animated.timing(
-        this.state.backgroundOpacity,
-        {toValue: 1, duration: 400,}
+        this.state.backgroundOpacity, {
+          toValue: 1,
+          duration: 400,
+        }
       ).start();
     });
     

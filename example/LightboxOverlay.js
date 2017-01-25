@@ -15,42 +15,57 @@ const propTypes = {
   style: View.propTypes.style,
   imageUrl: PropTypes.string,
   isVisible: PropTypes.bool,
+  isAnimated: PropTypes.bool,
   renderHeader: PropTypes.func.isRequired,
   renderFooter: PropTypes.func,
   onClose: PropTypes.func.isRequired,
 
 };
 
-const defaultProps = {
-  layoutOpacity: new Animated.Value(1),
-};
-
-const intialState = {
-  openVal: new Animated.Value(0),
-  isAnimating: false,
-};
 
 class LightboxOverlay extends Component {
 
+  static defaultProps = {
+    layoutOpacity: new Animated.Value(1),
+  }
+
   constructor(props) {
     super(props);
-    this.state = intialState;
   }
 
-  open() {
-    Animated.spring(
-      this.state.openVal,
-      {
-        toValue: 1,
+  state = {
+    openVal: new Animated.Value(0),
+    isAnimating: false,
+  };
+
+  componentWillReceiveProps(newProps) {
+    if (this.props.isVisible !== newProps.isVisible) {
+      if (newProps.isVisible) {
+        this.animateOpen();
+      } else {
+        this.animateClose();
       }
-    ).start(() => this.setState({ isAnimating: false }));
+    }
   }
 
-  close() {
-    Animated.spring(
-      this.state.openVal,
-      {
-        toValue: 0
+  animateOpen = () => {
+    this.setState({ isAnimating: true });
+    Animated.timing(
+      this.state.openVal, {
+        toValue: 1,
+        duration: 400,
+      }
+    ).start(() => {
+      this.setState({ isAnimating: false })
+    });
+  }
+
+  animateClose = () => {
+    this.setState({ isAnimating: true });
+    Animated.timing(
+      this.state.openVal, {
+        toValue: 0,
+        duration: 400,
       }
     ).start(() => {
       this.setState({
@@ -60,35 +75,26 @@ class LightboxOverlay extends Component {
     });
   }
 
-  renderBackground() {
+  render() {
+
     return (
-      <Animated.View
-        style={styles.background}
-      />
+      <Modal visible={this.props.isVisible || this.state.isAnimating} transparent={true} onRequestClose={() => {}}>
+        <Animated.View style={[styles.background, { opacity: this.state.openVal }]}>
+          {this.props.children}
+          <View pointerEvents='box-none' style={styles.overlay}>
+            <View pointerEvents='auto' style={styles.headerContainer}>
+              {this.props.renderHeader(this.props.onClose)}
+            </View>
+            <View pointerEvents='none' style={styles.footerContainer}>
+              {this.props.renderFooter()}
+            </View>
+          </View>
+        </Animated.View>
+      </Modal>
     );
   }
 
-  render() {
-
-    // var lightboxOpacity = {
-    //   opacity: this.openVal.interpolate({inputRange: [0, 1], outputRange: [0, target.opacity]})
-    // };
-
-    return (
-      <Modal visible={this.props.isVisible} transparent={true} onRequestClose={() => {}}>
-        {this.renderBackground()}
-        {this.props.children}
-        <View pointerEvents='box-none' style={styles.overlay}>
-          <View pointerEvents='auto' style={styles.headerContainer}>
-            {this.props.renderHeader(this.props.onClose)}
-          </View>
-          <View pointerEvents='none' style={styles.footerContainer}>
-            {this.props.renderFooter()}
-          </View>
-        </View>
-      </Modal>
-    );
-  }}
+}
 
 var styles = StyleSheet.create({
   background: {
@@ -119,6 +125,5 @@ var styles = StyleSheet.create({
 
 
 LightboxOverlay.propTypes = propTypes;
-LightboxOverlay.defaultProps = defaultProps;
 
 export default LightboxOverlay;
