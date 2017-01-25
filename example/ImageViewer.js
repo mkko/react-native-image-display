@@ -104,7 +104,9 @@ class ImageViewer extends Component {
 
   renderLoading() {
     return (
-      <ActivityIndicator style={styles.activityIndicator} animating={!this.state.preloadedSource} />
+      <View style={styles.activityOverlay}>
+        <ActivityIndicator style={styles.activityIndicator} animating={true} />
+      </View>
     );
   }
 
@@ -153,9 +155,18 @@ var styles = StyleSheet.create({
   image: {
     resizeMode: 'contain',
   },
-  activityIndicator: {
+  activityOverlay: {
     position: 'absolute',
-    left: 0, top: 0, right: 0, bottom: 0,
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  activityIndicator: {
+    flex: 1,
   },
   contain: {
     flex: 1,

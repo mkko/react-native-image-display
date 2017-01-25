@@ -67,18 +67,34 @@ class Lightbox extends Component {
     );
   }
 
+  _render() {
+    return (
+      <View
+        ref={component => this._root = component}
+        style={{
+          backgroundColor: '#ddf',
+          flex: 1,
+        }}>
+        <TouchableHighlight
+          underlayColor={this.props.underlayColor}
+          onPress={this.open}>
+          <View style={{flex: 1, height: 150, backgroundColor: 'purple'}}>
+          </View>
+        </TouchableHighlight>
+      </View>
+    );
+  }
+
   render() {
     return (
       <View
         ref={component => this._root = component}
-        style={this.props.style}>
-        <Animated.View>
-          <TouchableHighlight
-            underlayColor={this.props.underlayColor}
-            onPress={this.open}>
-            {this.props.children}
-          </TouchableHighlight>
-        </Animated.View>
+        style={[this.props.style]}>
+        <TouchableHighlight
+          underlayColor={this.props.underlayColor}
+          onPress={this.open}>
+          {this.props.children}
+        </TouchableHighlight>
 
         <LightboxOverlay
           isVisible={this.state.isOpen}
@@ -101,6 +117,11 @@ var styles = StyleSheet.create({
   image: {
     width: window.width,
     height: window.height,
+  },
+  touchArea: {
+    flex: 1,
+    alignSelf: 'stretch',
+    backgroundColor: 'yellow',
   },
   close: {
     marginTop: 16,

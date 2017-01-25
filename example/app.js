@@ -18,7 +18,8 @@ import {
 import Lightbox from './Lightbox';
 
 const images = [{
-  uri: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Polarlicht_2.jpg'
+  //uri: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Polarlicht_2.jpg'
+  uri: 'file:///Users/mval/Polarlicht_2.jpg'
 }];
 
 export default class App extends Component {
@@ -39,15 +40,16 @@ export default class App extends Component {
 
   render() {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={{alignItems: 'center'}}>
         <Text style={styles.welcome}>
           Click the photo
         </Text>
         <Lightbox
           images={images}
+          style={styles.thumbnail}
           renderFooter={this.renderFooter}>
           <Image
-            style={styles.thumbnail}
+            style={styles.thumbnailContent}
             resizeMode="cover"
             source={{ uri: images[0].uri }}
           />
@@ -65,10 +67,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   thumbnail: {
-    flex: 1,
-    height: 150,
     width: 150,
-    resizeMode: 'stretch',
+    backgroundColor: '#ddf',
+  },
+  thumbnailContent: {
+    height: 150,
+    flex: 1,
   },
   welcome: {
     fontSize: 20,
