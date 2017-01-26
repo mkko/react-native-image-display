@@ -15,7 +15,6 @@ const propTypes = {
   style: View.propTypes.style,
   imageUrl: PropTypes.string,
   isVisible: PropTypes.bool,
-  isAnimated: PropTypes.bool,
   renderHeader: PropTypes.func.isRequired,
   renderFooter: PropTypes.func,
   onClose: PropTypes.func.isRequired,

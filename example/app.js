@@ -18,8 +18,7 @@ import {
 import Lightbox from './Lightbox';
 
 const images = [{
-  //uri: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Polarlicht_2.jpg'
-  uri: 'file:///Users/mval/Polarlicht_2.jpg'
+  uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Polarlicht_2.jpg/1200px-Polarlicht_2.jpg'
 }];
 
 export default class App extends Component {
