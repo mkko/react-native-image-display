@@ -21,8 +21,8 @@
     "name" : "Mikko Välimäki",
     "email" : "mkko1373@gmail.com",
     "url" : "http://barnyrubble.tumblr.com/"
-  }
-  "license": "MIT"
+  },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mkko/react-native-image-display/issues"
   }
