@@ -1,0 +1,29 @@
+{
+  "name": "ImageDisplay",
+  "version": "0.0.1",
+  "description": "Simple lightbox implementation",
+  "main": "???.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkko/react-native-image-display"
+  },
+  "keywords": [
+    "react-component",
+    "react-native",
+    "ios",
+    "android",
+    "lightbox",
+    "photo",
+    "image",
+    "gallery"
+  ],
+  "author": {
+    "name" : "Mikko Välimäki",
+    "email" : "mkko1373@gmail.com",
+    "url" : "http://barnyrubble.tumblr.com/"
+  }
+  "license": "MIT"
+  "bugs": {
+    "url": "https://github.com/mkko/react-native-image-display/issues"
+  }
+}
