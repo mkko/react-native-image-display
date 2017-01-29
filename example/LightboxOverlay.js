@@ -5,11 +5,11 @@ import React, {
 import {
   StyleSheet,
   Animated,
-  TouchableHighlight,
   View,
   Modal,
-  ScrollView,
 } from 'react-native';
+
+const ANiM_DURATION = 400;
 
 const propTypes = {
   style: View.propTypes.style,
@@ -18,9 +18,7 @@ const propTypes = {
   renderHeader: PropTypes.func.isRequired,
   renderFooter: PropTypes.func,
   onClose: PropTypes.func.isRequired,
-
 };
-
 
 class LightboxOverlay extends Component {
 
@@ -52,7 +50,7 @@ class LightboxOverlay extends Component {
     Animated.timing(
       this.state.openVal, {
         toValue: 1,
-        duration: 400,
+        duration: ANiM_DURATION,
       }
     ).start(() => {
       this.setState({ isAnimating: false })
@@ -64,9 +62,10 @@ class LightboxOverlay extends Component {
     Animated.timing(
       this.state.openVal, {
         toValue: 0,
-        duration: 400,
+        duration: ANiM_DURATION,
       }
     ).start(() => {
+      console.log('complete');
       this.setState({
         isAnimating: false,
       });
@@ -85,7 +84,7 @@ class LightboxOverlay extends Component {
               {this.props.renderHeader(this.props.onClose)}
             </View>
             <View pointerEvents='none' style={styles.footerContainer}>
-              {this.props.renderFooter()}
+              {this.props.renderFooter && this.props.renderFooter()}
             </View>
           </View>
         </Animated.View>
@@ -102,6 +101,7 @@ var styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    flex: 1,
     backgroundColor: '#000e',
   },
   overlay: {

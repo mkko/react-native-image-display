@@ -5,15 +5,15 @@ import React, {
 import {
   StyleSheet,
   Animated,
-  TouchableHighlight,
   TouchableWithoutFeedback,
   View,
-  Modal,
   Image,
   ScrollView,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+
+const ANIM_DURATION = 200;
 
 const propTypes = {
   style: View.propTypes.style,
@@ -51,17 +51,13 @@ class ImageViewer extends Component {
     const uri = this.props.source.uri;
     Image
       .prefetch(uri)
-      .then(() => {
-        console.log(`✔ Prefetch OK from ${uri}`);
-      })
       .then(() => getSize(uri))
       .then(size => {
-        console.log(`✔ Got size ${size}`);
         // TODO: layout might not be available yet.
         const {width, height} = this.state.layout;
         const minimumZoomScale = Math.min(height / size.height, width / size.width);
-        console.log('minimumZoomScale', minimumZoomScale);
-        
+
+        // TODO: Right now we just set the size to the windows'
         size = Dimensions.get('window');
 
         // TODO: The component might not be mounted anymore.
@@ -77,29 +73,22 @@ class ImageViewer extends Component {
   }
 
   onLayout(event) {
-    console.log('w:', event.nativeEvent.layout.width);
     this.setState({
       layout: event.nativeEvent.layout,
     });
   }
 
-  handleScroll(event) {
-    console.log(event.nativeEvent.contentOffset.y);
-  }
-
   onImageLoad() {
-    console.log('Image loaded:');
     this.setState({
       isLoading: false,
     }, () => {
       Animated.timing(
         this.state.backgroundOpacity, {
           toValue: 1,
-          duration: 400,
+          duration: ANIM_DURATION,
         }
       ).start();
     });
-    
   }
 
   renderLoading() {
@@ -114,7 +103,7 @@ class ImageViewer extends Component {
     return this.state.size && (
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ alignItems:'center', justifyContent:'center', width: this.state.size.width, height: this.state.size.height}}
+        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center', width: this.state.size.width, height: this.state.size.height}}
         minimumZoomScale={1} 
         maximumZoomScale={10}
         centerContent={true}
@@ -125,9 +114,7 @@ class ImageViewer extends Component {
         horizontal={true}
         directionalLockEnabled={false}
         showsHorizontalScrollIndicator={this.props.showsHorizontalScrollIndicator} 
-        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator} 
-        scrollEventThrottle={200}
-        onScroll={this.handleScroll}>
+        showsVerticalScrollIndicator={this.props.showsVerticalScrollIndicator}>
           <TouchableWithoutFeedback style={styles.container}>
             <Animated.Image
               source={this.state.preloadedSource}
@@ -139,10 +126,8 @@ class ImageViewer extends Component {
   }
 
   render() {
-    const onTap = this.props.onTap ? this.props.onTap : function() {};
-
     return (
-      <View style={styles.container} onLayout={this.onLayout}>
+      <View style={[this.props.style, styles.container]} onLayout={this.onLayout}>
         {this.renderLoading()}
         {this.renderContent()}
       </View>
@@ -162,8 +147,8 @@ var styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     flex: 1,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   activityIndicator: {
     flex: 1,

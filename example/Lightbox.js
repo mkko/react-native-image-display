@@ -10,12 +10,9 @@ import {
   TouchableOpacity,
   Text,
   View,
-  Modal,
-  Image,
 } from 'react-native';
 import LightboxOverlay from './LightboxOverlay';
 import ImageViewer from './ImageViewer';
-import ZoomableImage from './ZoomableImage';
 
 const propTypes = {
   style: View.propTypes.style,
@@ -78,12 +75,13 @@ class Lightbox extends Component {
   render() {
     return (
       <View
-        ref={component => this._root = component}
         style={[this.props.style]}>
         <TouchableHighlight
           underlayColor={this.props.underlayColor}
           onPress={this.open}>
-          {this.props.children}
+          <View>
+            {this.props.children}
+          </View>
         </TouchableHighlight>
 
         <LightboxOverlay
@@ -101,16 +99,11 @@ class Lightbox extends Component {
 
 var styles = StyleSheet.create({
   image: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1
   },
   touchArea: {
     flex: 1,
     alignSelf: 'stretch',
-    backgroundColor: 'yellow',
   },
   close: {
     marginTop: 16,
